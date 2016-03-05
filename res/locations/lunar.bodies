@@ -1,0 +1,44 @@
+satellite type: none
+Small Moon:
+	1:
+		mass 1k-2k
+		density 1-10
+		temperature 50-55
+		randomized chemical ; 1-2%
+	2:
+		mass 2k-3k
+		density 1-10
+		temperature 50-55
+		randomized chemical ; 5-10%
+
+Moon:
+	1:
+		mass 2k-4k
+		density 5-6
+		temperature 100-110
+		randomized chemical ; 1-5%
+		randomized metal ; 2-3%
+	2:
+		mass 3k-5k
+		density 2-7
+		randomized chemical ; 2-10%
+
+Large Moon:
+	1:
+		mass 5k-10k
+		density 5-6
+		temperature 200-210
+		randomized chemical ; 1-2%
+	2:
+		mass 7.5k-11k
+		density 4-5		
+		temperature 270-310
+		randomized plant ; 0-1%
+		randomized metal ; 2-3%
+		randomized chemical ; 5-10%
+	3:
+		mass 8k-12k
+		density 5-6
+		temperature 280-300
+		randomized plant ; 2-5%
+		randomized animal ; 3-4%

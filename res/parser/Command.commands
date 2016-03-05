@@ -1,0 +1,61 @@
+from/by/to/of/the/
+ship's/ship/
+entity's/entity/
+Condition:
+	Condition:
+		MustHaveTrait is Trait...
+		MustntHaveTrait isn't Trait...
+		- either Condition Condition
+		* and Condition
+		* or Condition
+		- has Number String
+		- lacks String
+		Object ? Object Condition
+		GreaterThan > Number Number
+Action:
+	Action:
+		GainTrait gain Trait
+		LoseTrait lose Trait
+		- drain Number Number
+		- fill Number Number
+		- heal
+		- addSpace String
+		- set String Number
+		- while Condition
+		- if Condition...
+		OnStart onstart String String
+		- addTraitChoice Trait...
+		- print Number
+		- every Number String
+		- transferResource Number Number Object String Object
+		- implantMaterials Object Range
+		SetSatelliteType satellite String String
+		SetMass mass Range
+		SetMoons moons Range
+		SetTemperature temperature Range
+		SetDensity density Range
+	Number:
+		- random
+		- sum Number...
+		- product Number...
+		- since String
+		- now
+		* + Number
+		* * Number
+		Inverse / Number
+		NegativeNumber - Number
+		- from Object String
+		Normalize as Number Condition
+	Object:
+		GetShip ship's
+		GetEntity entity's
+		GetArea area String
+		GetLocation location
+		RandomizedMaterial randomized String...
+List:
+	Trait:
+		- traits Trait...
+		RandomTraitFrom randomTrait Trait...
+String:
+	String[]:
+		* \" String...

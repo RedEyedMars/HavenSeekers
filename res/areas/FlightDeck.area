@@ -1,0 +1,10 @@
+NewDestination:
+	onstart commanding " NAME is deciding a new destination for the spacecraft to go to "
+		sum 1000 - as 200 is JourneymanPilot - as 300 is MasterPilot  
+	#Requirements
+	either ? ship lacks destination or ? location lacks interest 
+	#Properties
+	leadership.
+	piloting.
+	#Actions
+	

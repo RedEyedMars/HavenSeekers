@@ -1,0 +1,31 @@
+package parser;
+
+
+import java.util.*;
+import environment.ship.*;
+import environment.items.*;
+import environment.items.action.*;
+import time.action.*;
+import main.*;
+import misc.*;
+import misc.action.*;
+import misc.action.access.*;
+import misc.action.block.*;
+import misc.action.math.*;
+import misc.condition.*;
+import misc.condition.access.*;
+import misc.condition.logic.*;
+import misc.condition.withable.*;
+import misc.wrappers.*;
+import entity.*;
+import entity.choice.*;
+import entity.trait.*;
+import entity.trait.action.*;
+import entity.trait.condition.*;
+import location.action.*;
+
+public class ParserCommandsAreas {
+	static void setup(Map<String,ParserCommand> commandMap){
+{0}
+	}
+}

@@ -1,0 +1,25 @@
+Refine(engineer):
+	onstart refining " NAME is refining raw materials for energy "
+		sum 500 + \\
+				  product 50 * as 10 > the ship's materials 9 ; + \\
+				  product 55 * as the ship's materials > 10 the ship's materials
+	#Requirements
+	is Focused
+	#Properties
+	unhygenic.
+	ship_improvement.
+	#Actions
+	if > 5 the ship's materials
+		while ? ship has 1 materials
+			drain 1 from ship's materials
+			fill 5 to ship's energy
+		gain Distracted
+	if ? ship has 5 materials
+		drain 5 from ship's materials
+		fill 25 to ship's energy
+		if is Energetic
+			gain Tired
+		if is Tired and ? ship has 5 materials
+			drain 5 from ship's materials
+			fill 25 to ship's energy
+			gain traits Fatigued, Distracted

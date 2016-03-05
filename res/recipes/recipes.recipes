@@ -1,0 +1,54 @@
+EnergyPack:
+	chemical with cathode 1x
+	chemical with anode 1x
+	metal with conductor 2x
+	fill 5 to ship's energy
+SpeedBoost:
+	chemical with fuel 5x
+	fill 1 to ship's speed
+MiningEquipment:
+	metal with durable 3x
+	engine with rotor 1x
+	fill 1 to area Drill efficiency
+HuntingGear:
+	metal with malleable 2x
+	chemical with explosive 2x
+	fill 1 to vehicle hunter efficiency
+RawEngine:
+	metal with durable 2x
+	cogs with big 1x
+	cogs with small 2x
+	belt with rubber 1x
+	makeItem engine rotor
+CogSmall:
+	metal with malleable 2x
+	makeItem cogs small
+CogsBig:
+	metal with malleable 4x
+	makeItem cogs big
+Stimulant:
+	plant with stimulant 3x
+	for anyone is Distracted
+		duration 2500
+			gain Focused
+		after 500
+			gain traits Distracted, Fatigued
+Meat:
+	animal with edible 1x	
+	for anyone is Tired
+		gain Energetic
+Vegetables:
+	plant with edible 1x
+	for anyone is Distracted
+		gain Focused
+Salve:
+	chemical with numbing 2x
+	cloth with bandage 1x	
+	for anyone is Wounded
+		heal
+Bandage:
+	1:
+		plant with clothable 5x
+	2:
+		animal with clothable 2x
+	makeItem cloth bandage

@@ -1,0 +1,7 @@
+satellite type: solar
+Small Yellow Star:
+	mass 3000k-4000k
+	density 1-2
+	moons 2-8
+	temperature 10-15k
+	randomized chemical ; 90-100%

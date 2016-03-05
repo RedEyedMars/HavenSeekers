@@ -1,0 +1,13 @@
+Read(reader):
+	onstart reading " NAME is reading in the library "
+		sum 100 + product 100 * the entity's patience
+#	Requirements
+#	Properties
+	reading.
+#	Actions
+	if is Bookworm
+		if is Tired
+			gain Energetic
+		fill by entity's patience to entity's happiness
+	if > random sum 0.80 - product 0.1 * the entity's patience
+		addTraitChoice ApprenticeMechanic ApprenticeMedic

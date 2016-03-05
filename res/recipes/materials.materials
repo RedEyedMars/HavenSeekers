@@ -1,0 +1,20 @@
+#raw materials so far:
+chemical:
+	mineable.
+	cathode
+	anode
+	explosive
+	fuel
+metal:
+	mineable.
+	conductor
+	resistor
+	malleable
+	durable
+animal:
+	edible
+	clothable
+plant:
+	edible
+	clothable
+	stimulant

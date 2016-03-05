@@ -1,0 +1,78 @@
+= @ on NewChoice
+#Chotomies
+Healthy/Wounded/
+Fatigued/Tired/Energetic/
+Focused/Distracted/
+Unfit/Fit/Overweight/Obese/
+#Health
+Wounded:
+	@ add 3 with infirmary
+	@ add 5 with heal
+	@ add -3 with risk
+	@ add -5 with highrisk
+	LeftArmWounded:
+		@ add -1 with bothArm
+		@ add -2 with leftArm
+		@ add 1 with rigthArm
+		LeftArmDead:
+			@ prevent with leftArm
+	RightArmWounded:
+		@ add -1 with bothArm
+		@ add 1 with leftArm
+		@ add -2 with rigthArm
+		RightArmDead:
+			@ prevent with rightArm
+
+#Professional
+ApprenticeMechanic profession_1 6:
+	@ add 2 with fix
+	@ add 3 with upgrade
+	@ add 1 with ship_improvement
+	JourneymanMechanic profession_1 7:
+		ProfessionalMechanic profession_1 8:
+			MasterMechanic profession_1 9:
+
+ApprenticeMedic profession_1 1:
+	@ add 2 with other's_improvement
+	@ add 3 with infirmary
+	@ add 1 with medic
+	JourneymanMedic profession_1 2:
+		ProfessionalMedic profession_1 3:
+			MasterMedic profession_1 4:
+			
+ApprenticePilot profession_1 16:
+	@ add 4 with pilot
+	@ add 2 with fly
+	@ add -1 with antisocial
+	@ add 2 with risk
+	JourneymanPilot profession_1 17:
+		ProfesionalPilot profession_1 18:
+			MasterPilot profession_1 19:
+
+#Appearance
+Smelly:
+	@ add -5 with social
+	@ add 2 with self_improvement	
+	@ add 3 with hygenic
+	@ add 4 with cleaning
+Fit:
+	@ add 3 with physical
+	@ add 2 with exercise
+	@ add 1 with self_improvement
+Unfit:
+	@ add 2 with physical
+	@ add 1 with exercise
+Obese:
+	@ add -3 with physical
+	@ add 2 with eat
+Overweight:
+	@ add -2 with physical
+	@ add 1 with eat
+
+#Personality
+Cautious:
+	@ add -2 with risk.
+	@ add -10 with highrisk
+Unfulfilled:
+	@ add 3 with fulfilling
+	@ add 1 with self_improvement

@@ -1,0 +1,69 @@
+satellite type: lunar
+Gas Giant:
+	mass 50k-100k
+	density 1-2
+	moons 4-20
+	randomized chemical ; 50-70%
+
+Asteroid:
+	mass 1k-1.5k
+	density 7-10
+	randomized metal ; 10-15%
+
+Small Planet:
+	1:
+		mass 10k-15k
+		density 9-12
+		moons 0-1
+		randomized metal ; 5%
+	2:
+		mass 7.5k-12.5k
+		density 8-11d
+		randomized metal ; 5%
+		randomized chemical ; 2.5-5%
+
+Medium Planet:
+	1:
+		mass 15k-30k
+		density 10-13
+		moons 0-2
+		randomized plant ; 2-3%
+		randomized chemical ; 3-5%
+		randomized metal ; 2-7%
+	2:
+		mass 15k-25k
+		density 10-11
+		moons 0-1
+		randomized chemical ; 7-10%
+		randomized metal ; 4-8%
+	3:
+		mass 12.5k-32.5k
+		density 9-14
+		moons 0-2
+		randomized animal ; 0.5-2%
+		randomized plant ; 3-5%
+		randomized chemical ; 1-2%
+		randomized metal ; 1-7%
+
+Large Planet:
+	1:
+		mass 30k-40k
+		density 8-10
+		moons 0-10
+		randomized plant ; 2-3%
+		randomized chemical ; 3-5%
+		randomized metal ; 5-10%
+	2:
+		mass 32.5k-45k
+		density 9-11
+		moons 1-6
+		randomized chemical ; 7-10%
+		randomized metal ; 4-8%
+	3:
+		mass 32.5k-49k
+		density 7-10
+		moons 3-5
+		randomized animal ; 0.5-2%
+		randomized plant ; 3-5%
+		randomized chemical ; 1-2%
+		randomized metal ; 1-7%
