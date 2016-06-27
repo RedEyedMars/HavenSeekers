@@ -7,8 +7,13 @@ import environment.Direction;
 import environment.Position;
 import environment.Positionable;
 import gui.graphics.GraphicEntity;
+import misc.condition.Condition;
+import parser.StringHeirachy;
+import storage.Storable;
+import storage.Storer;
+import storage.StorerageIterator;
 
-public class Wall extends GraphicEntity implements Positionable{
+public class Wall extends GraphicEntity implements Positionable {
 
 	private Position position;
 	private boolean cover;

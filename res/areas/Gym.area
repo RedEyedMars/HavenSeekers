@@ -1,6 +1,6 @@
 Workout(gymnast):
 	onstart workingOut " NAME is working out in the rec room "
-		sum 100 + product 100 * the entity's stamina * the area Gym efficiency
+		sum 100 + product 100 * the entity's stamina * the area efficiency
 #	Requirements
 	isn't Fatigued
 #	Properties
@@ -29,14 +29,14 @@ Workout(gymnast):
 
 PersonalTrainer(PersonalTrainer):
 	onstart personalTraining " NAME is helping others working out in the rec room "
-		sum 100 + product 100 * the entity's stamina / the area Gym efficiency
-		fill by entity's stamina to area Gym efficiency		
+		sum 100 + product 100 * the entity's stamina / the area efficiency
+		fill by entity's stamina to area efficiency		
 		if is Energetic
-			fill product 0.5 * by entity's stamina ; to area Gym efficiency
+			fill product 0.5 * by entity's stamina ; to area efficiency
 #	Requirements
 	isn't Fatigued
 	is Fit
-	area Gym has 1 gymnast?
+	area has 1 gymnast?
 #	Properties
 	workout.
 	other's_improvement.

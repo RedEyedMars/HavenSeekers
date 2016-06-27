@@ -1,27 +1,31 @@
 package location;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import entity.choice.ChoicePrototype;
 import location.materials.Resource;
 import location.materials.ResourcePrototype;
-import location.storage.LocationStorer;
 import main.Hub;
 import main.Log;
+import misc.condition.Condition;
 import misc.condition.access.Propertiable;
 import misc.wrappers.FloatWrapper;
+import misc.wrappers.StorableFloatWrapper;
+import parser.StringHeirachy;
 import storage.Storable;
 import storage.Storer;
-import storage.StorerIteratorIterator;
+import storage.StorerageIterator;
 
 public class Location implements Propertiable,Storable{
 	private static final float distanceToTemperatureConversionRate = 1000;
 	
 	
-	private Map<String,FloatWrapper> values = new HashMap<String,FloatWrapper>();
+	private Map<String,StorableFloatWrapper> values = new HashMap<String,StorableFloatWrapper>();
 	private List<Location> satellites = new ArrayList<Location>();
 	private List<Resource> resources = new ArrayList<Resource>();
 	private Float mass;
@@ -30,47 +34,45 @@ public class Location implements Propertiable,Storable{
 	private Float temperature = 100f;
 	private LocationType myClass;
 	private Location parentBody;
-	private LocationStorer storer = new LocationStorer(this);
-	public Location(LocationType type){
-		this.myClass = type;
-		values.put("interest", new FloatWrapper(0f){
+	public Location(){
+		values.put("interest", new StorableFloatWrapper(new FloatWrapper(0f){
 			@Override
 			public Float get(){
 				return interest();
 			}
-		});
-		values.put("mineable_resource", new FloatWrapper(0f){
+		}));
+		values.put("mineable_resource", new StorableFloatWrapper(new FloatWrapper(0f){
 			@Override
 			public Float get(){
 				return getMineableResource();
 			}
 
-		});
-		values.put("mineable_resource_id", new FloatWrapper(0f){
+		}));
+		values.put("mineable_resource_id", new StorableFloatWrapper(new FloatWrapper(0f){
 			@Override
 			public Float get(){
 				return getMineableResourceId();
 			}
-		});
-		values.put("mass", new FloatWrapper(0f){
+		}));
+		values.put("mass", new StorableFloatWrapper(new FloatWrapper(0f){
 			@Override
 			public Float get(){
 				return getMass();
 			}
-		});
-		values.put("moons", new FloatWrapper(0f){
+		}));
+		values.put("moons", new StorableFloatWrapper(new FloatWrapper(0f){
 			@Override
 			public Float get(){
 				return (float) satellites.size();
 			}
-		});
-		values.put("density", new FloatWrapper(0f){
+		}));
+		values.put("density", new StorableFloatWrapper(new FloatWrapper(0f){
 			@Override
 			public Float get(){
 				return getDensity();
 			}
-		});
-		values.put("temperature", new FloatWrapper(0f){
+		}));
+		values.put("temperature", new StorableFloatWrapper(new FloatWrapper(0f){
 			@Override
 			public Float get(){
 				if(parentBody!=null){
@@ -78,13 +80,17 @@ public class Location implements Propertiable,Storable{
 				}
 				return getTemperature();
 			}
-		});
-		values.put("distance", new FloatWrapper(0f){
+		}));
+		values.put("distance", new StorableFloatWrapper(new FloatWrapper(0f){
 			@Override
 			public Float get(){
 				return getDistance();
 			}
-		});
+		}));
+	}
+	public Location(LocationType type){
+		this();
+		this.myClass = type;
 		List<String> names = new ArrayList<String>();
 		for(String name:Hub.resourceTypes.keySet()){
 			names.add(name);
@@ -117,7 +123,7 @@ public class Location implements Propertiable,Storable{
 		if(values.containsKey(property)){
 			return false;
 		}
-		values.put(property, new FloatWrapper(value));
+		values.put(property, FloatWrapper.s(value));
 		return true;
 	}
 	public void removeResource(String resourceName,int by){
@@ -145,14 +151,14 @@ public class Location implements Propertiable,Storable{
 	public void addResource(String name){
 		Resource r = Hub.resourceTypes.get(name).create();
 		if(!values.containsKey(r.getFullName())){
-			values.put(r.getFullName(), new FloatWrapper(0f));
+			values.put(r.getFullName(), FloatWrapper.s(0f));
 		}
 		values.get(r.getFullName()).set(values.get(r.getFullName()).get()+1);
 		resources.add(r);
 	}
 	public void addResource(Resource r,Integer by){
 		if(!values.containsKey(r.getFullName())){
-			values.put(r.getFullName(), new FloatWrapper(0f));
+			values.put(r.getFullName(), FloatWrapper.s(0f));
 		}
 		values.get(r.getFullName()).set(values.get(r.getFullName()).get()+by);
 		for(int i=0;i<by;++i){
@@ -199,14 +205,31 @@ public class Location implements Propertiable,Storable{
 		else return null;
 	}
 
-	public Iterable<Storer> getStorerIterator() {
-		return new StorerIteratorIterator(
-				new Iterable[]{},
-				new Map[]{values});
-	}
+
+	private Storer<Location> storer = new Storer<Location>(this,"L"){
+		@Override
+		protected Object[] storeCharacteristics() {
+			return o();
+		}
+
+		@Override
+		protected void adjust(Object... args) {
+		}
+
+		
+	};
 	@Override
 	public Storer getStorer() {
 		return storer;
 	}
-	
+
+	public Iterable<Storer> getStorerIterator() {
+		return new StorerageIterator(
+				this,"values"){
+			@Override
+			protected Object getField(Field field, Object target) throws IllegalArgumentException, IllegalAccessException{
+				return field.get(target);
+			}
+		};
+	}
 }

@@ -1,12 +1,12 @@
 Mine(miner):
 	onstart mining " NAME is mining for resources "
-		sum 200 + product 200 * the area Drill efficiency
+		sum 200 + product 200 * the area efficiency
 		every 10 ticks
 			if ? location has 1 mineable_resource
-				transferResource the location mineable_resource_id 1 location -> area Wares
+				transferResource the location mineable_resource_id 1 location -> wares
 	#Requirements
-	area Drill has 1 drillbit?
-	area Drill has 0.1 efficiency?
+	area has 1 drillbit?
+	area has 0.1 efficiency?
 	#Properties
 	mining.
 	#Actions

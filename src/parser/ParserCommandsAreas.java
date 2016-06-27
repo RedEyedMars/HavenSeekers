@@ -362,10 +362,17 @@ public class ParserCommandsAreas {
 			}
 		});
 		commandMap.put("area",new ParserCommand<GetAreaAction>(){
-			{type="Object"; prototypes = new String[]{"String"};}
+			{type="Object"; prototypes = new String[]{};}
 			@Override
 			public GetAreaAction execute(){
-				return new GetAreaAction(((ParserCommand<String>)params.get(0)).execute());
+				return new GetAreaAction();
+			}
+		});
+		commandMap.put("wares",new ParserCommand<GetWaresAction>(){
+			{type="Object"; prototypes = new String[]{};}
+			@Override
+			public GetWaresAction execute(){
+				return new GetWaresAction();
 			}
 		});
 		commandMap.put("location",new ParserCommand<GetLocationAction>(){

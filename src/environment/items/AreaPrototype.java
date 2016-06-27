@@ -13,7 +13,6 @@ import entity.choice.graphics.IconChoice;
 import entity.choice.graphics.Iconable;
 import environment.Position;
 import environment.Positionable;
-import environment.items.storage.AreaStorer;
 import environment.ship.tile.Tile;
 import environment.ship.tile.TravelPoint;
 import gui.graphics.GraphicEntity;
@@ -28,16 +27,13 @@ import misc.condition.access.Propertiable;
 import misc.wrappers.FloatWrapper;
 import storage.Storable;
 import storage.Storer;
-import storage.StorerIteratorIterator;
+import storage.StorerageIterator;
 
-public class AreaPrototype extends GraphicEntity implements Iconable, Propertiable, ChoiceGenerator, Modifiable, Storable{
-	private static int uid = 0;
+public class AreaPrototype extends GraphicEntity implements Iconable, Propertiable, ChoiceGenerator, Modifiable {
 	private List<ChoicePrototype> choicePrototypes = new ArrayList<ChoicePrototype>();
-	private int id = 0;
 	private String name;
 	private Map<String,FloatWrapper> values = new HashMap<String,FloatWrapper>();
 	
-	private AreaStorer storer;
 	public AreaPrototype(String name){
 		super("area_"+(name.contains("(")?name.replaceAll("\\(.*", ""):name).toLowerCase());
 		this.name = name;
@@ -57,7 +53,6 @@ public class AreaPrototype extends GraphicEntity implements Iconable, Propertiab
 			}
 		}
 		values.put("efficiency", new FloatWrapper(1f));
-		id = uid++;
 	}
 
 	public FloatWrapper getProperty(String property) {
@@ -111,11 +106,10 @@ public class AreaPrototype extends GraphicEntity implements Iconable, Propertiab
 		return values.containsKey(key);
 	}
 	public Area create(){
-		Area area = new Area(name,this);
+		Area area = new Area(this);
 		for(String key:values.keySet()){
 			area.addProperty(key, values.get(key).get());
 		}
-		area.setId(id);
 		return area;
 	}
 	@Override
@@ -125,7 +119,6 @@ public class AreaPrototype extends GraphicEntity implements Iconable, Propertiab
 			area.values.put(key, new FloatWrapper(values.get(key).get()));
 		}
 		area.choicePrototypes = choicePrototypes;
-		area.id = id;
 		return area;
 	}
 	@Override
@@ -136,11 +129,11 @@ public class AreaPrototype extends GraphicEntity implements Iconable, Propertiab
 	public void modify(String operation, Object... arguments) {		
 	}
 	public static void makeMenuItems(TabMenu list, String catagory) {
-		for(final String key:Hub.areas.keySet()){
-			AreaPrototype area = Hub.areas.get(key).clone();
+		for(String key:Hub.areas.keySet()){
+			final AreaPrototype area = Hub.areas.get(key).clone();
 			GraphicView graphicView = new HorizontalGraphicList(){
 				{
-					addChild(new TextGraphicElement(key, TextGraphicElement.MEDIUM));
+					addChild(new TextGraphicElement(area.getName(), TextGraphicElement.MEDIUM));
 				}
 				@Override
 				public void adjust(float dx, float dy){
@@ -160,17 +153,6 @@ public class AreaPrototype extends GraphicEntity implements Iconable, Propertiab
 	private static class AreaMenuItem extends MenuItem{
 		public AreaMenuItem(final Modifiable capturedTarget, GraphicView visualTarget) {
 			super(capturedTarget, new float[]{1f}, visualTarget);
-		}
-		
-	}
-	@Override
-	public Storer getStorer() {
-		return storer;
-	}
-	@Override
-	public Iterable<Storer> getStorerIterator() {
-		return new StorerIteratorIterator(
-				new List[]{},
-				new Map[]{});
+		}		
 	}
 }

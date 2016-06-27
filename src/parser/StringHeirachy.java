@@ -14,27 +14,24 @@ public class StringHeirachy extends ArrayList<StringHeirachy>{
 	private String value;
 	private StringHeirachy parent;
 	private char id;
+	public StringHeirachy(){
+		this(-1,"ROOT$",null);
+	}
 	public StringHeirachy(int level, String value, StringHeirachy parent){
-		super();
-		this.level = level;
-		this.value = value.substring(0,value.length()-1);
-		this.id = value.charAt(value.length()-1);
-		this.parent = parent;
-		if(parent!=null){
-			 rules = parent.rules;
-		}
-		else {
-			rules = new HashMap<String,String>();
-		}
+		this(level,value.substring(0,value.length()-1),value.charAt(value.length()-1),parent);
 	}
 	public StringHeirachy(int level, String value, char id, StringHeirachy parent){
 		super();
 		this.level = level;
 		this.value = value;
 		this.id = id;
+		while(value.length()>0&&id=='\n'){
+			id = value.charAt(value.length()-1);
+			value = value.substring(0,value.length()-1);
+		}
 		this.parent = parent;
 		if(parent!=null){
-			 rules = parent.rules;
+			rules = parent.rules;
 		}
 		else {
 			rules = new HashMap<String,String>();
@@ -68,15 +65,14 @@ public class StringHeirachy extends ArrayList<StringHeirachy>{
 	@Override
 	public String toString(){
 		StringBuilder builder = new StringBuilder();
-		builder.append("[");
-		builder.append(hashCode());
-		builder.append(":<");
-		builder.append(parent==null?"null":parent.hashCode());
-		builder.append(">(");
-		builder.append(level);
-		builder.append(",");
-		builder.append(id);
-		builder.append(")]");
+		//builder.append("[");
+		//builder.append(hashCode());
+		//builder.append(":<");
+		//builder.append(parent==null?"null":parent.hashCode());
+		//builder.append(">(");
+		//builder.append(",");
+		//builder.append(id);
+		//builder.append(")]");
 		for(int i=0;i<level;++i){
 			builder.append("\t");
 		}
@@ -94,7 +90,7 @@ public class StringHeirachy extends ArrayList<StringHeirachy>{
 		return appendLine(line);
 	}
 	public void write(String line){
-		
+
 	}
 	public String getValue() {
 		return value;
@@ -107,5 +103,32 @@ public class StringHeirachy extends ArrayList<StringHeirachy>{
 	}
 	public void addRule(String s1, String s2) {
 		rules.put(s1, s2);
+	}
+	public static StringHeirachy parseFromFile(String filename){
+		try {
+			new Parser(){
+				@Override
+				public void parseInput(String prefix, String suffix, StringHeirachy input){
+					throw new HeirachyPassbackException(input);
+				}
+			}.readAndParseFile(filename);
+		}
+		catch (HeirachyPassbackException hpe){
+			return hpe.get();
+		}
+		return null;
+	}
+	private static class HeirachyPassbackException extends RuntimeException {
+		private StringHeirachy stringHeirachy;
+
+		public HeirachyPassbackException(StringHeirachy stringHeirachy){
+			this.stringHeirachy = stringHeirachy;
+		}
+		public StringHeirachy get(){
+			return stringHeirachy;
+		}
+	}
+	public String getFullValue() {
+		return value+id;
 	}
 }

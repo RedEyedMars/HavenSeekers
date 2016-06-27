@@ -9,27 +9,27 @@ Upgrade(mechanic):
 	ship_improvement.
 	upgrade.
 #	Actions
-	fill 0.5 to area Infirmary efficiency
+	fill 0.5 to area efficiency
 	addSpace Infirmary
 	lose traits Focused Energetic
 	drain 150 from ship's energy
 
 Doctor(doctor):
 	onstart doctoring " NAME is doctoring in the infirmary "
-		product 100 * the area Infirmary patient * the area Infirmary efficiency
-		fill by entity's medicalProwess to area Infirmary efficiency
-		set patients from area Infirmary patient
+		product 100 * the area patient * the area efficiency
+		fill by entity's medicalProwess to area efficiency
+		set patients from area patient
 #	Requirements
 	is Focused JourneymanMedic
 	ship has 50 energy?
-	area Infirmary has 1 patient?
+	area has 1 patient?
 #	Properties
 	fulfilling.
 	other's_improvement.
 	medic.
 	infirmary.
 #	Actions
-	set patients sum of entity's patients - the area Infirmary patient
+	set patients sum of entity's patients - the area patient
     gain traits Distracted, Unfulfilled, Fatigued
     if ? entity's has 0 patients
     	gain Tired
@@ -41,11 +41,11 @@ Doctor(doctor):
 	
 Heal(patient):
 	onstart healing " NAME is healing in the infirmary "
-		product 100 * the entity's wounds / the area Infirmary efficiency
+		product 100 * the entity's wounds / the area efficiency
 #	Requirements
 	is Wounded
 	ship has 70 energy?
-	area Infirmary has 1 vacantSpace?
+	area has 1 vacantSpace?
 #	Properties
 	infirmary.
 	self_improvement.

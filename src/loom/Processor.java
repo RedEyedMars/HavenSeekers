@@ -3,6 +3,7 @@ package loom;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeSet;
 
@@ -17,13 +18,20 @@ public class Processor extends Thread implements Comparable<Processor>{
 		coreSize = Runtime.getRuntime().availableProcessors();
 		for(int i=0;i<coreSize;++i){
 			Processor toAdd = new Processor();
-			toAdd.start();
-			processors.add(toAdd);
+			synchronized(toAdd.processes){
+				try {
+					toAdd.start();
+					toAdd.processes.wait();
+					processors.add(toAdd);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 		readyProcessor = processors.iterator();
 	}
 	private static int sid = 0;
-	private List<Process> procList = new ArrayList<Process>();
+	private LinkedList<Process> processes = new LinkedList<Process>();
 	private int id;
 	public Processor(){
 		super();
@@ -32,15 +40,19 @@ public class Processor extends Thread implements Comparable<Processor>{
 	@Override
 	public void run(){
 		while(Gui.running){
-			while(!procList.isEmpty()){
-					procList.remove(0).act();
-			}
-			System.out.println("release"+ id);
 			try {
-				synchronized(procList){
-					procList.notifyAll();
-					procList.wait();
+				synchronized(processes){
+					processes.notifyAll();
 				}
+				synchronized(processes){
+					if(processes.isEmpty()){
+						processes.wait();
+					}
+				}
+				while(!processes.isEmpty()){
+					processes.removeFirst().act();
+				}
+
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -48,12 +60,9 @@ public class Processor extends Thread implements Comparable<Processor>{
 	}
 
 	private void add(Process action){
-		System.out.println("process added to "+id);
-		synchronized(procList){
-			procList.add(action);
-			if(procList.size()==1){
-				procList.notifyAll();
-			}
+		synchronized(processes){
+			processes.add(action);
+			processes.notifyAll();
 		}
 	}
 
@@ -65,35 +74,40 @@ public class Processor extends Thread implements Comparable<Processor>{
 	}
 
 	public static void close(){
+
 		for(Processor processor:processors){
-			synchronized(processor.procList){
-				processor.procList.clear();
-				processor.procList.notifyAll();
+			processor.processes.clear();
+		}
+		for(Processor processor:processors){
+			synchronized(processor.processes){
+				processor.processes.notifyAll();
 			}
 		}
 	}
 
 	public synchronized static void joinAll(){
 		for(Processor processor:processors){
-			synchronized(processor.procList){
-				while(!processor.procList.isEmpty()){
-					try {
-						System.out.println("wait for!"+processor.id);
-						processor.procList.wait();
-					} catch (InterruptedException e) {
-						e.printStackTrace();
+			while(!processor.processes.isEmpty()){
+				try {
+					synchronized(processor.processes){
+						//System.out.println("wait for!"+processor.id);
+						processor.processes.wait();
 					}
+				} catch (InterruptedException e) {
+					e.printStackTrace();
 				}
 			}
 		}
+		//System.out.println("checked:"+processor.id);
 	}
+
 
 	@Override
 	public int compareTo(Processor other) {
-		if(other.procList.size()==procList.size()){
+		if(other.processes.size()==processes.size()){
 			if(other==this)return 0;
 			else return -1;
 		}
-		return procList.size()-other.procList.size();
+		return processes.size()-other.processes.size();
 	}
 }

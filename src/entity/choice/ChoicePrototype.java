@@ -1,5 +1,6 @@
 package entity.choice;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -8,13 +9,14 @@ import entity.Entity;
 import entity.choice.graphics.IconChoice;
 import entity.choice.graphics.IconTextChoice;
 import entity.choice.graphics.Iconable;
-import entity.choice.storage.ChoicePrototypeStorer;
 import misc.action.Action;
 import misc.action.ActionAcceptor;
 import misc.condition.Condition;
+import misc.wrappers.StorableFloatWrapper;
+import parser.StringHeirachy;
 import storage.Storable;
 import storage.Storer;
-import storage.StorerIteratorIterator;
+import storage.StorerageIterator;
 import time.action.OnStartAction;
 
 public class ChoicePrototype extends ActionAcceptor<Entity> implements Iconable, Storable{
@@ -26,7 +28,6 @@ public class ChoicePrototype extends ActionAcceptor<Entity> implements Iconable,
 	private List<Condition<Entity>> conditions = new ArrayList<Condition<Entity>>();
 	private List<Action<Entity>> onStarts = new ArrayList<Action<Entity>>();
 
-	private ChoicePrototypeStorer storer = new ChoicePrototypeStorer(this);
 	public ChoicePrototype(String name) {
 		int index = name.indexOf('(');
 		if(index>=0){
@@ -96,6 +97,17 @@ public class ChoicePrototype extends ActionAcceptor<Entity> implements Iconable,
 		return molly;
 	}
 
+	private Storer<ChoicePrototype> storer = new Storer<ChoicePrototype>(this,"C"){
+		@Override
+		protected Object[] storeCharacteristics() {
+			return o();
+		}
+
+		@Override
+		protected void adjust(Object... args) {
+		}
+
+		};
 	@Override
 	public Storer getStorer() {
 		return storer;
@@ -103,9 +115,13 @@ public class ChoicePrototype extends ActionAcceptor<Entity> implements Iconable,
 
 	@Override
 	public Iterable<Storer> getStorerIterator() {
-		return new StorerIteratorIterator(
-				new List[]{this,properties,conditions,onStarts},
-				new Map[]{});
+		return new StorerageIterator(
+				this/*,this,properties,conditions,onStarts(}*/){
+			@Override
+			protected Object getField(Field field, Object target) throws IllegalArgumentException, IllegalAccessException{
+				return field.get(target);
+			}
+		};
 		
 	}
 

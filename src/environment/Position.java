@@ -1,6 +1,8 @@
 package environment;
 
-public class Position {
+import java.util.Observable;
+
+public class Position extends Observable{
 	private int x;
 	private int y;
 	public Position(float x, float y){
@@ -18,22 +20,25 @@ public class Position {
 	}
 	public void setX(int i) {
 		x = i;
+		this.setChanged();
+		this.notifyObservers();
 	}
 	public void setY(int y) {
 		this.y = y;
-		
+		this.setChanged();
+		this.notifyObservers();		
 	}
 	public void up() {
-		++y;
+		this.setY(y+1);
 	}
 	public void down() {
-		--y;
+		this.setY(y-1);
 	}
 	public void right() {
-		++x;
+		this.setX(y+1);
 	}
 	public void left() {
-		--x;
+		this.setX(y-1);
 	}
 	public Direction getDirectionTo(Position position) {
 		float angle = (float) Math.atan2(position.getY()-getY(),position.getX()-getX());
@@ -42,7 +47,10 @@ public class Position {
 	}
 	@Override
 	public int hashCode(){
-		return (x+1)*10000+(y+1)*3;
+		return (x+1)*10000+(y+1);
+	}
+	public static int[] dehash(int hash){
+		return new int[]{hash/10000-1,hash%10000-1};
 	}
 	@Override
 	public Position clone(){

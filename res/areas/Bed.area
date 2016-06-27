@@ -1,11 +1,11 @@
 Sleep:
-	onstart sleeping " NAME is sleeping in the dormatory "
+	onstart sleeping " NAME is sleeping in a bed "
 		sum 2000 + as 500 is Fatigued
 #	Requirements
 	is Fatigued
-	area Dorm has 1 vacantSpace?
+	area has 1 vacantSpace?
 #	Properties
-	dorm.
+	bed.
 	sleep.
 	antisocial.
 #	Actions

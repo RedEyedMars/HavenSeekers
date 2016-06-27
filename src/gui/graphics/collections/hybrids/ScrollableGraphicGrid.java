@@ -2,6 +2,8 @@ package gui.graphics.collections.hybrids;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observer;
+import java.util.Observable;
 
 import gui.graphics.GraphicView;
 import gui.graphics.collections.ScrollableGraphicView;
@@ -11,7 +13,7 @@ import environment.Positionable;
 import environment.ship.tile.Tile;
 import environment.ship.tile.Tileable;
 
-public class ScrollableGraphicGrid extends ScrollableGraphicView implements Tileable{
+public class ScrollableGraphicGrid extends ScrollableGraphicView implements Tileable, Observer {
 
 	private List<Positionable> elements = new ArrayList<Positionable>();
 	private int gridWidth;
@@ -26,6 +28,7 @@ public class ScrollableGraphicGrid extends ScrollableGraphicView implements Tile
 	public void addChild(GraphicView child){
 		if(child instanceof Positionable){
 			elements.add((Positionable)child);
+			((Positionable)child).getPosition().addObserver(this);
 			super.addChild(child);
 		}
 		else {
@@ -36,6 +39,7 @@ public class ScrollableGraphicGrid extends ScrollableGraphicView implements Tile
 	public void removeChild(GraphicView child){
 		if(child instanceof Positionable){
 			elements.remove((Positionable)child);
+			((Positionable)child).getPosition().deleteObserver(this);
 			super.removeChild(child);
 		}
 		else {
@@ -102,5 +106,11 @@ public class ScrollableGraphicGrid extends ScrollableGraphicView implements Tile
 	public void reputTile(Tile tile){
 		removeTile(tile);
 		addTile(tile);
+	}
+
+	@Override
+	public void update(Observable o, Object arg) {
+		this.isUpToDate = false;
+		Hub.updateView = true;
 	}
 }

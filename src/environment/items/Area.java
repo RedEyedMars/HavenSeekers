@@ -1,5 +1,6 @@
 package environment.items;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -12,9 +13,9 @@ import entity.choice.ChoicePrototype;
 import entity.choice.graphics.IconChoice;
 import environment.Position;
 import environment.Positionable;
-import environment.items.storage.AreaStorer;
 import environment.ship.tile.Tile;
 import environment.ship.tile.TravelPoint;
+import gui.graphics.GraphicElement;
 import gui.graphics.GraphicEntity;
 import gui.graphics.GraphicView;
 import gui.graphics.collections.HorizontalGraphicList;
@@ -23,30 +24,34 @@ import main.Hub;
 import gui.menu.MenuItem;
 import gui.menu.Modifiable;
 import gui.menu.TabMenu;
+import misc.condition.Condition;
 import misc.condition.access.Propertiable;
 import misc.wrappers.FloatWrapper;
+import misc.wrappers.StorableFloatWrapper;
+import parser.StringHeirachy;
 import storage.Storable;
 import storage.Storer;
-import storage.StorerIteratorIterator;
+import storage.StorerageIterator;
 
 public class Area extends GraphicEntity implements Propertiable, Positionable, Storable{
-	private int id = 0;
 	private List<Tile> tilesOn = new ArrayList<Tile>();
-	private Map<String,FloatWrapper> values = new HashMap<String,FloatWrapper>();
-	private Position position;
+	protected Map<String,StorableFloatWrapper> values = new HashMap<String,StorableFloatWrapper>();
+	private Position position = new Position(0,0);
 	
 	private AreaPrototype prototype;
-	private AreaStorer storer;
-	public Area(String name, AreaPrototype prototype){
-		super("area_"+(name.contains("(")?name.replaceAll("\\(.*", ""):name).toLowerCase());
+	public Area(AreaPrototype prototype){
+		super(prototype.getTextureName());
 		this.prototype = prototype;
-		values.put("vacantSpace", new FloatWrapper(0f){
+		values.put("vacantSpace", new StorableFloatWrapper(new FloatWrapper(0f){
 			@Override
 			public Float get(){
 				return (float)vacant();
 			}
-		});
-		values.put("efficiency", new FloatWrapper(1f));
+		}));
+		values.put("efficiency", FloatWrapper.s(1f));
+	}
+	public Area(){
+		super("blank");
 	}
 	public void addSlot(Tile tile) {
 		tilesOn.add(tile);
@@ -124,24 +129,51 @@ public class Area extends GraphicEntity implements Propertiable, Positionable, S
 	}
 	public boolean addProperty(String key, Float value) {
 		if(values.containsKey(key))return false;
-		values.put(key, new FloatWrapper(value));
+		values.put(key, FloatWrapper.s(value));
 		return true;
 	}
 	public boolean hasProperty(String key) {
 		return values.containsKey(key);
 	}
+	private Storer storer = new Storer<Area>(this,"A"){
+		{
+			strings = 1;
+		}
+		@Override
+		protected Object[] storeCharacteristics() {
+			return o(prototype.getName());
+		}
+		@Override
+		protected void adjust(Object... args) {
+			self.setName((String) args[0]);
+		}
+	};
 	@Override
 	public Storer getStorer() {
 		return storer;
 	}
 	@Override
 	public Iterable<Storer> getStorerIterator() {
-		return new StorerIteratorIterator(
-				new List[]{},
-				new Map[]{values});
+		return new StorerageIterator(
+				this,"values"){
+			@Override
+			protected Object getField(Field field, Object target) throws IllegalArgumentException, IllegalAccessException{
+				return field.get(target);
+			}
+		};
 	}
-	public void setId(int id) {
-		this.id = id;
+	public void setName(String name) {
+		System.out.println("setName:"+name);
+		if(Hub.areas.get(name)==null){
+		for(String key:Hub.areas.keySet()){
+			System.out.println(key);
+		}
+		}
+		this.prototype = Hub.areas.get(name);
+		this.entity = new GraphicElement(prototype.getTextureName(),this);
+		this.isUpToDate = false;
+		Hub.updateView = true;
+		Hub.updateLayers = true;
 		
 	}
 	public AreaPrototype getPrototype() {

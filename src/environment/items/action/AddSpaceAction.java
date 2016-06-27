@@ -12,9 +12,10 @@ public class AddSpaceAction implements Action<Entity>{
 	}
 	@Override
 	public void act(Entity subject) {
-		subject.getShip().getArea(name).addSlot(
-				subject.getShip().getTileFromCondition(subject.getShip().getArea(name),
-				new UnOwnedTileCondition()));
+		subject.getArea().addSlot(
+				subject.getShip().getTileFromCondition(
+						subject.getArea(),
+						new UnOwnedTileCondition()));
 	}
 
 }

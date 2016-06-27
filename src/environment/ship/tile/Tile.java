@@ -1,28 +1,49 @@
 package environment.ship.tile;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import entity.Entity;
+import entity.choice.ChoicePrototype;
 import environment.Direction;
 import environment.Position;
 import environment.Positionable;
 import environment.items.Area;
-import environment.ship.tile.storage.TileStorer;
 import gui.graphics.GraphicEntity;
 import gui.inputs.MotionEvent;
+import main.Hub;
 import main.Log;
+import misc.condition.Condition;
+import parser.StringHeirachy;
 import storage.Storable;
 import storage.Storer;
-import storage.StorerIteratorIterator;
+import storage.StorerageIterator;
 
 public class Tile extends GraphicEntity implements Positionable, Storable{
 	final private TravelPoint position;
-	private List<Area> areaThatOwnsThis = new ArrayList<Area>();
+	protected List<Area> areaThatOwnsThis = new ArrayList<Area>(){
+		@Override
+		public boolean add(Area area){
+			if(isUnowned()&&!area.getPosition().equals(position)){
+				setOwner(area,isPrimaryAreaTile);
+				return true;
+			}
+			else {
+				return super.add(area);
+			}
+		}
+		@Override
+		public Area remove(int i){
+			Area area = get(i);
+			setOwner(null,false);
+			return area;
+		}
+	};
 
-	private List<Entity> entityOnTopOfThis = new ArrayList<Entity>();
+	protected List<Entity> entityOnTopOfThis = new ArrayList<Entity>();
 	
 	private boolean isPrimaryAreaTile = false;
 	protected boolean isTravelPoint = false;
@@ -30,7 +51,11 @@ public class Tile extends GraphicEntity implements Positionable, Storable{
 	private LinkedList<Direction> travelPointMap = new LinkedList<Direction>();
 	private LinkedList<TravelPoint> travelPoints;
 	
-	private TileStorer storer = new TileStorer(this);
+	public Tile(){
+		super("floor_tile_2");
+		this.position = new TravelPoint(0,0);
+		this.travelPoints = this.position.getNexts();		
+	}
 	public Tile(int x, int y) {
 		super("floor_tile_2");
 		this.position = new TravelPoint(x,y);
@@ -77,17 +102,18 @@ public class Tile extends GraphicEntity implements Positionable, Storable{
 	}
 
 	public boolean isUnowned() {
-		return areaThatOwnsThis==null;
+		return areaThatOwnsThis.isEmpty();
 	}
 
 	public void setOwner(Area area,boolean primary) {
-		if(!areaThatOwnsThis.isEmpty()&&isPrimaryAreaTile){
+		if(!isUnowned()&&isPrimaryAreaTile){
 			removeChild(areaThatOwnsThis.get(0));
+			areaThatOwnsThis.remove(areaThatOwnsThis.get(0));
 		}
-		this.areaThatOwnsThis.add(area);
 		if(area != null){
 			this.isPrimaryAreaTile = primary;
 			if(primary){
+				area.setPosition(this.position);
 				addChild(area);
 				area.setTravelPoint(getTravelPoint());
 				if(!isTravelPoint()){
@@ -95,6 +121,7 @@ public class Tile extends GraphicEntity implements Positionable, Storable{
 					((Tileable)parent).reputTile(this);
 				}
 			}
+			this.areaThatOwnsThis.add(area);
 		}
 	}
 	public void removeOwner(){
@@ -142,7 +169,8 @@ public class Tile extends GraphicEntity implements Positionable, Storable{
 	}
 	public void learnPointsFromTouchingTile(Tile tile){
 		List<Integer> indicesUsed = new ArrayList<Integer>();
-		for(int i=0;i<tile.travelPoints.size();++i){
+		int size = tile.travelPoints.size();
+		for(int i=0;i<size;++i){
 			int index = learnTravelPoint(tile,tile.travelPoints.get(i),tile.travelPointMap.get(i));
 			if(index!=-1){
 				indicesUsed.add(index);
@@ -176,7 +204,7 @@ public class Tile extends GraphicEntity implements Positionable, Storable{
 			if(from==null){
 				travelPointMap.set(index,directionOfTarget);
 				return index;
-			}
+			}			
 			TravelPath myPath = TravelPath.findQuickest(getTravelPoint(), target);
 			TravelPath theirPath = TravelPath.findQuickest(from.getTravelPoint(), target);
 			if(myPath.getDistance()<theirPath.getDistance()){
@@ -226,14 +254,46 @@ public class Tile extends GraphicEntity implements Positionable, Storable{
 			travelPointMap.remove(indexOf);
 		}
 	}
+
+	private Storer<Tile> storer = new Storer<Tile>(this,"T"){
+		{
+			integers = 2;
+			booleans = 2;
+		}
+		@Override
+		protected Object[] storeCharacteristics() {
+			return o(self.getPosition().getX(),self.getPosition().getY(),
+					self.isPrimaryAreaTile,self.isTravelPoint);
+		}
+		@Override
+		protected void adjust(Object... objs) {
+			int x = (int) objs[0];
+			int y = (int) objs[1];
+			if(x!=self.position.getX()||y!=self.position.getY()){
+				self.position.setX(x);
+				self.position.setY(y);
+				//reAdd = true;
+			} 
+			self.isPrimaryAreaTile = (boolean) objs[2];
+			self.isTravelPoint = (boolean) objs[3];
+		}
+	};
 	@Override
-	public Storer getStorer() {
+	public Storer<Tile> getStorer() {
 		return storer;
 	}
 
 	public Iterable<Storer> getStorerIterator() {
-		return new StorerIteratorIterator(
-				new Iterable[]{areaThatOwnsThis,entityOnTopOfThis,travelPointMap,travelPoints},
-				new Map[]{});
+		return new StorerageIterator(
+				this,"areaThatOwnsThis"
+				/*,entityOnTopOfThis,travelPointMap,travelPoints*/){
+			@Override
+			protected Object getField(Field field, Object target) throws IllegalArgumentException, IllegalAccessException{
+				return field.get(target);
+			}
+		};
+	}
+	public Area getArea() {
+		return areaThatOwnsThis.get(0);
 	}
 }

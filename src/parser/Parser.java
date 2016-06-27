@@ -96,7 +96,7 @@ public class Parser {
 	}
 
 	public void readAndParseFile(String filename){
-		StringHeirachy input = new StringHeirachy(-1,"ROOT$",null);
+		StringHeirachy input = new StringHeirachy();
 		StringHeirachy root = input;
 		String prefix = filename.substring(filename.lastIndexOf(File.separator)+1,filename.lastIndexOf('.'));
 		String suffix = filename.substring(filename.lastIndexOf('.')+1);		

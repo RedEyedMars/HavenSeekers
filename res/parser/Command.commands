@@ -49,7 +49,8 @@ Action:
 	Object:
 		GetShip ship's
 		GetEntity entity's
-		GetArea area String
+		GetArea area
+		GetWares wares
 		GetLocation location
 		RandomizedMaterial randomized String...
 List:

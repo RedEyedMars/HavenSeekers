@@ -6,9 +6,11 @@ import environment.ship.menu.ShipConstructorMenu;
 import environment.ship.tile.TravelPath;
 import environment.ship.tile.TravelPoint;
 import parser.Parser;
+import storage.Storage;
 import gui.Gui;
 import location.Location;
 import location.materials.ResourcePrototype;
+import loom.Processor;
 
 public class Main {
 
@@ -18,15 +20,21 @@ public class Main {
 	public static void main(String[] args) {
 
 		Parser.parseAllConfigs();
-		//testSuite();
+		TestSuite.test(TestSuite.current);
 		//@SuppressWarnings("unused")
-		Gui gui = new Gui();
+		Gui gui = null;
+		gui = new Gui();
+		if(gui==null){//not using gui
+			Gui.running = false;
+			Processor.close();
+		}
 	}
 
 	public static void setup(){
 		Hub.parentBody = Hub.locationTypes.get("solar").create();
-		Ship ship = new Ship();
-		Gui.setView(new ShipConstructorMenu(ship));
+		ShipConstructorMenu view = (ShipConstructorMenu) Storage.load("./data/current.data", ShipConstructorMenu.class);
+				//new ShipConstructorMenu();
+		Gui.setView(view);
 	}
 	
 }

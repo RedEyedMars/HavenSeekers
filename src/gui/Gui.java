@@ -14,6 +14,7 @@ import java.util.Stack;
 
 import main.Hub;
 import main.Main;
+import storage.Storage;
 
 import org.lwjgl.opengl.*;
 import org.lwjgl.util.glu.*;
@@ -194,6 +195,7 @@ int counter = 0;
 	
 	@Override
 	public void cleanup(){
+		Storage.saveCurrentView();
 		Gui.running = false;
 		Processor.close();
 		super.cleanup();

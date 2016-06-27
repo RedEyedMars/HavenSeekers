@@ -1,5 +1,6 @@
 package environment.ship;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -8,6 +9,7 @@ import java.util.Map;
 
 import entity.Entity;
 import entity.choice.Choice;
+import entity.choice.ChoicePrototype;
 import entity.choice.MoveToAreaChoice;
 import entity.choice.graphics.IconChoice;
 import entity.choice.graphics.PopupChoice;
@@ -16,7 +18,6 @@ import environment.Direction;
 import environment.Position;
 import environment.Positionable;
 import environment.items.Area;
-import environment.ship.storage.ShipStorer;
 import environment.ship.tile.Tile;
 import environment.ship.tile.TravelPoint;
 import environment.ship.tile.Wall;
@@ -27,20 +28,38 @@ import misc.condition.Condition;
 import misc.condition.access.Propertiable;
 import misc.wrappers.FloatWrapper;
 import misc.wrappers.StorableFloatWrapper;
+import parser.StringHeirachy;
 import storage.Storable;
 import storage.Storer;
-import storage.StorerIteratorIterator;
+import storage.StorerageIterator;
 
 public class Ship implements Propertiable,Storable{
 	private static int shipId = 0;
 	private int id = shipId++;
-	private final List<Tile> tiles = new ArrayList<Tile>();
+	protected final List<Tile> tiles = new ArrayList<Tile>(){
+		@Override
+		public boolean add(Tile tile){
+			if(tileMap.containsKey(tile.getPosition().hashCode())){
+				return super.add(tile);
+			}
+			else {
+				addTileToShip(tile);
+				return true;
+			}
+		}
+		@Override
+		public Tile remove(int i){
+			Tile tile = tiles.get(i);
+			removeTileFromShip(tile);
+			return tile;
+		}
+	};
 	private final Map<Integer,Tile> tileMap = new HashMap<Integer,Tile>();
-	private final Map<Integer,Wall> walls = new HashMap<Integer,Wall>();
-	private final Map<String, Area> areas = new LinkedHashMap<String,Area>();
-	private final Map<String,StorableFloatWrapper> values = new HashMap<String,StorableFloatWrapper>();
-	private final List<Location> locations = new ArrayList<Location>();//0 = current location, 1=destination
-	private final Map<String, Vehicle> vehicles = new HashMap<String, Vehicle>();
+	protected final Map<Integer,Wall> walls = new HashMap<Integer,Wall>();
+	protected final List<Area> areas = new ArrayList<Area>();
+	protected final Map<String,StorableFloatWrapper> values = new HashMap<String,StorableFloatWrapper>();
+	protected final List<Location> locations = new ArrayList<Location>();//0 = current location, 1=destination
+	protected final Map<String, Vehicle> vehicles = new HashMap<String, Vehicle>();
 	private ScrollableGraphicGrid insideView = new ScrollableGraphicGrid(40,40,0.75f,1f){
 		@Override
 		public void addTile(Tile tile){
@@ -52,7 +71,6 @@ public class Ship implements Propertiable,Storable{
 		}
 	};
 	//private GraphicView outsideView = new GraphicEntity("blank");
-	private ShipStorer storer = new ShipStorer(this);
 	public Ship(){
 		values.put("energy", FloatWrapper.s(100f));
 		values.put("materials", FloatWrapper.s(0f));
@@ -91,11 +109,14 @@ public class Ship implements Propertiable,Storable{
 		values.put(property, FloatWrapper.s(value));
 		return true;
 	}
-	public Area getArea(String area) {
-		return areas.get(area);
-	}
-	public void addArea(Area area) {
-		this.areas.put(area.getName(),area);
+
+	public Area getArea(String areaName) {
+		for(Area area:areas){
+			if(area.getName().equals(area)){
+				return area;
+			}
+		}
+		return null;
 	}
 	public Tile getTile(int x, int y){
 		return tileMap.get(new Position(x,y).hashCode());
@@ -116,6 +137,7 @@ public class Ship implements Propertiable,Storable{
 		if(tile.isTravelPoint()){
 			placeTravelPoint(tile);
 		}
+
 		for(Direction direction:Direction.directions){
 			Position temp = direction.move(tile.getPosition());
 			if(walls.containsKey(temp.hashCode())){
@@ -123,8 +145,12 @@ public class Ship implements Propertiable,Storable{
 				wall.addSideTiled(direction.getInverse());
 			}
 		}
+
 		if(walls.containsKey(tile.getPosition().hashCode())){
 			walls.get(tile.getPosition().hashCode()).tileCover(true);
+		}
+		if(!tile.isUnowned()){
+			areas.add(tile.getArea());
 		}
 	}
 	private void placeTravelPoint(Tile tile){
@@ -133,7 +159,7 @@ public class Ship implements Propertiable,Storable{
 			if(tileMap.containsKey(lookingAt.hashCode())){
 				Tile otherTile = tileMap.get(lookingAt.hashCode());
 				if(!otherTile.isTravelPoint()){
-					giveTilesTravelPoint(otherTile.getPosition(),tile.getTravelPoint(),direction,null,null,new ArrayList<Integer>());
+					giveTilesTravelPoint(otherTile.getPosition(),tile.getTravelPoint(),direction,null,null,new ArrayList<Integer>());					
 				}
 				else {
 					tile.learnPointsFromTouchingTile(otherTile);
@@ -212,13 +238,12 @@ public class Ship implements Propertiable,Storable{
 		if(areas.isEmpty())return;
 		IconChoice<Area>[] icons = new IconChoice[areas.size()];
 		int i=0;
-		for(String name:areas.keySet()){
-			icons[i] = areas.get(name).getIcon();
+		for(Area area:areas){
+			icons[i] = area.getIcon();
 			++i;
 		}
 		Decision<Area> moveToDecision = new Decision<Area>(new PopupChoice<Area>(entity.getName()+" must chose between areas to go to.",icons));
-		for(String areaName:areas.keySet()){
-			Area area = areas.get(areaName);
+		for(Area area:areas){
 			Choice choice = new MoveToAreaChoice(area);
 			moveToDecision.add(choice);
 		}
@@ -277,15 +302,35 @@ public class Ship implements Propertiable,Storable{
 	public boolean isWalled(Position receivedPosition) {
 		return walls.get(receivedPosition.hashCode()).isVisible();
 	}
+
+	private Storer<Ship> storer = new Storer<Ship>(this,"S"){
+		{
+			integers=1;
+		}
+		@Override
+		protected Object[] storeCharacteristics() {
+			System.out.println("Store ship id:"+self.getId());
+			return new Object[]{self.getId()};
+		}
+		@Override
+		protected void adjust(Object... args) {
+			System.out.println("ship id:"+args[0]);
+		}
+
+	};
 	@Override
-	public Storer getStorer(){
+	public Storer<Ship> getStorer(){
 		return storer;
 	}
 	@Override
 	public Iterable<Storer> getStorerIterator() {
-		return new StorerIteratorIterator(
-				new Iterable[]{tiles,locations},
-				new Map[]{walls,areas,values});//,vehicles});
+		return new StorerageIterator(
+				this,"tiles","locations","values"/*,"vehicles"*/){
+			@Override
+			protected Object getField(Field field, Object target) throws IllegalArgumentException, IllegalAccessException{
+				return field.get(target);
+			}
+		};
 	}
 	public int getId(){
 		return id;

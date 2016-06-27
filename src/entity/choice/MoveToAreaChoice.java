@@ -12,8 +12,8 @@ public class MoveToAreaChoice extends Choice{
 	public MoveToAreaChoice(Area area) {
 		super("moveTo"+area.getName(),null);
 		//this.area = area;
-		addOnStart(new MoveToAreaAction(area.getName()));
-		addAction(new DecisionInAreaAction(area.getName()));
+		addOnStart(new MoveToAreaAction(area));
+		addAction(new DecisionInAreaAction(area));
 	}
 
 }

@@ -194,6 +194,7 @@ public class GraphicView implements Graphicable, MouseListener{
 		for(int i=0;i<children.size();++i){
 			children.get(i).adjust(dWidth,dHeight);
 		}
+		this.isUpToDate = true;
 	}
 
 	@Override
@@ -214,10 +215,6 @@ public class GraphicView implements Graphicable, MouseListener{
 		adjust(getWidth(),getHeight());
 		setX(getX());
 		setY(getY());
-		this.isUpToDate = true;
-		for(int i=0;i<children.size();++i){
-			children.get(i).isUpToDate=true;
-		}
 	}
 	public void addChild(GraphicView e){
 		children.add(e);

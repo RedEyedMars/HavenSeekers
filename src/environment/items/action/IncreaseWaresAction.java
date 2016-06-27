@@ -20,8 +20,8 @@ public class IncreaseWaresAction implements Action<Entity> {
 		by.act(subject);
 		to.act(subject);
 		String resource = ResourcePrototype.translateResourceId(to.getFloat());
-		if(!subject.getShip().getArea("wares").addProperty(resource,by.getFloat())){
-			FloatWrapper value = subject.getShip().getArea("wares").getProperty(resource);
+		if(!subject.getShip().getArea("Wares").addProperty(resource,by.getFloat())){
+			FloatWrapper value = subject.getShip().getArea("Wares").getProperty(resource);
 			value.set(value.get()+by.getFloat());
 		}
 	}

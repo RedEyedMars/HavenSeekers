@@ -37,9 +37,10 @@ public class CommandParser extends Parser{
 	public void parseInput(String prefix,String suffix,StringHeirachy input){
 		StringBuilder builder = new StringBuilder();
 		StringBuilder ender = new StringBuilder();
-		for(StringHeirachy s:input){
-			parse(s,null,null,builder,ender);
-		}
+		if("commands".equals(suffix)){
+			for(StringHeirachy s:input){
+				parse(s,null,null,builder,ender);
+			}
 		builder.append(ender.toString());
 		try{
 			FileWriter writer = new FileWriter(new File("src/parser/ParserCommandsAreas.java"), false);
@@ -48,8 +49,10 @@ public class CommandParser extends Parser{
 		} catch(IOException e){
 			e.printStackTrace();
 		}
+
+		}
 	}
-	
+
 	public void findDIR(File file,String header){
 		if(file==null||file.listFiles()==null)return;
 		for(File sub:file.listFiles()){

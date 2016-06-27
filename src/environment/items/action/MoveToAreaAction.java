@@ -12,16 +12,15 @@ import environment.items.Area;
 
 public class MoveToAreaAction extends OnStartAction{
 	private static final long serialVersionUID = 4453577396525215602L;
-	private String area;
-	public MoveToAreaAction(String areaName) {
-		super("moving", "NAME is moving to "+areaName);
-		this.area = areaName;
+	private Area area;
+	public MoveToAreaAction(Area area) {
+		super("moving", "NAME is moving to "+area.getName());
+		this.area = area;
 	}
 
 
 	@Override
 	public void act(Entity subject) {
-		Area area = subject.getShip().getArea(this.area);
 		if(first){
 			add(new GetDistanceToAreaAction(area)); 
 			start = new GetIntegerAction(0f);

@@ -2,6 +2,7 @@ package misc.wrappers;
 
 import java.util.Iterator;
 
+import entity.choice.ChoicePrototype;
 import misc.condition.Condition;
 import parser.StringHeirachy;
 import storage.Storable;
@@ -12,9 +13,12 @@ public class StorableFloatWrapper extends FloatWrapper implements Storable{
 	private FloatWrapper wrapper;
 	private FloatStorer storer;
 	public StorableFloatWrapper(FloatWrapper f){
-		super(f.get());
+		super(0f);
 		wrapper = f;
 		storer = new FloatStorer(this);
+	}
+	public StorableFloatWrapper(){
+		this(null);
 	}
 
 	@Override
@@ -22,12 +26,14 @@ public class StorableFloatWrapper extends FloatWrapper implements Storable{
 		return wrapper.get();
 	}
 	public void set(Float o){
-		wrapper.set(o);
+		if(wrapper!=null){
+			wrapper.set(o);
+		}
 	}
 
 	@Override
 	public Storer getStorer() {
-		return null;
+		return storer;
 	}
 
 	@Override
@@ -50,26 +56,22 @@ public class StorableFloatWrapper extends FloatWrapper implements Storable{
 
 	};}
 
-	private class FloatStorer extends Storer {
-		public FloatStorer(Storable self) {
-			super(self);
+	private class FloatStorer extends Storer<StorableFloatWrapper> {
+
+		public FloatStorer(StorableFloatWrapper self) {
+			super(self, "F");
+			floats = 1;
 		}
-
 		@Override
-		protected String storeSelf() {
-			return ""+wrapper.get();
+		protected Object[] storeCharacteristics() {
+			return o(wrapper.get());
 		}
-
 		@Override
-		protected Iterable<Condition<String>> loadRules() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		protected void loadSelf(StringHeirachy input) {
-			// TODO Auto-generated method stub
-
+		protected void adjust(Object... args) {
+			if(wrapper==null){
+				wrapper = new FloatWrapper(0f);
+			}
+			wrapper.set((Float) args[0]);
 		}
 
 	}

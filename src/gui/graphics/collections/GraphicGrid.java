@@ -8,8 +8,10 @@ import environment.ship.tile.Tileable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
-public class GraphicGrid extends GraphicView implements Tileable{
+public class GraphicGrid extends GraphicView implements Tileable, Observer{
 	private List<Positionable> elements = new ArrayList<Positionable>();
 	private int gridWidth;
 	private int gridHeight;
@@ -23,6 +25,7 @@ public class GraphicGrid extends GraphicView implements Tileable{
 	public void addChild(GraphicView child){
 		if(child instanceof Positionable){
 			elements.add((Positionable)child);
+			((Positionable)child).getPosition().addObserver(this);
 			super.addChild(child);
 		}
 		else {
@@ -33,6 +36,7 @@ public class GraphicGrid extends GraphicView implements Tileable{
 	public void removeChild(GraphicView child){
 		if(child instanceof Positionable){
 			elements.remove((Positionable)child);
+			((Positionable)child).getPosition().deleteObserver(this);
 			super.removeChild(child);
 		}
 		else {
@@ -83,5 +87,11 @@ public class GraphicGrid extends GraphicView implements Tileable{
 	public void reputTile(Tile tile){
 		removeTile(tile);
 		addTile(tile);
+	}
+
+	@Override
+	public void update(Observable o, Object arg) {
+		this.isUpToDate = false;
+		Hub.updateView = true;
 	}
 }

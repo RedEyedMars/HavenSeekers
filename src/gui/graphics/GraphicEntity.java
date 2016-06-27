@@ -95,4 +95,8 @@ public class GraphicEntity extends GraphicView {
 	public void setTextureName(String string) {
 		this.entity.setTextureName(string);
 	}
+	@Override
+	public String getTextureName() {
+		return entity.getTextureName();
+	}
 }
